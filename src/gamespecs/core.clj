@@ -1,6 +1,29 @@
-(ns gamespecs.core)
+(ns gamespecs.core
+  (:require [potemkin :as ptk]
+            simplecs.core
+            simplecs.tags
+            gamespecs.animations
+            gamespecs.app
+            gamespecs.input
+            gamespecs.util
+            gamespecs.files
+            gamespecs.systems))
 
-(defn foo
-  "I don't do a whole lot."
-  [x]
-  (println x "Hello, World!"))
+(defmacro import-nss
+  "Import entire namespaces."
+  [& nss]
+  `(ptk/import-vars
+    ~@(map #(apply vector % (keys (ns-publics %))) nss))) 
+
+  
+;;; Import all those crazy namespaces!
+(import-nss simplecs.core ;simplecs
+            simplecs.tags
+            
+            ;;gamespecs
+            gamespecs.animations 
+            gamespecs.app
+            gamespecs.input
+            gamespecs.util
+            gamespecs.files
+            gamespecs.systems)

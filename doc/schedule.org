@@ -1,0 +1,5 @@
+
+* 08/19/2013
+  - [X] Find a way to reset default state.
+  - [ ] Implement the reset method in the libgdx application adapter
+	- Use a key combo, and document it!
