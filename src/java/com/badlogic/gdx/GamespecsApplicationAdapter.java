@@ -32,18 +32,25 @@ public abstract class GamespecsApplicationAdapter extends ApplicationAdapter
 /*
  Return the initial state of the application.
  */
-	Object getInitialState(){
+	public Object getInitialState(){
 		return null;
 	}
 
-	Object getCurrentState(){
+	public Object getCurrentState(){
 		return null;
 	}
 
 /*
 Reset the application to its initial state.
 */
-	void reset(){
+	public void reset(){
 	}
+
+    /* This version of reset allows you to
+       pass a new application state, which replaces
+       the "initial state".
+     */
+        public void reset(Object o){
+        }
 }
 

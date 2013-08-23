@@ -2,7 +2,8 @@
   "This namespace provides some common, useful
  systems and component systems."
   (:require [simplecs.core :as sc]
-            [gamespecs.util :as util])
+            [gamespecs.util :as util]
+            [gamespecs.app :as app])
   (:import (com.badlogic.gdx Gdx)
            (com.badlogic.gdx.graphics GL10)))
 
@@ -32,9 +33,10 @@
                :else (throw (Exception.
                              "Color requires 1, 3, or 4 params.")))]
     {:color color
-     :init-color color}))
+     :init-color color
+     :time 0}))
 
-(sc/defcomponentsystem bg-color-draw-update
+(sc/defcomponentsystem bg-color-draw-update :background-color
   "Updates and draws the background color.
  Params : 
  tmin : Before this time, the background color will stay as it is.
@@ -44,13 +46,13 @@
  "
   [tmin tmax end-clr]
   [ces ent cmp]
-  (let [lf (util/clamp (util/lerp-factor (:total-time ces) tmin tmax) 0 1)
+  (let [lf (util/clamp (util/lerp-factor (:total-time app/*app-state*) tmin tmax) 0 1)
         [r g b a] (:color cmp)]
     (.glClearColor Gdx/gl r g b a)
     (.glClear Gdx/gl GL10/GL_COLOR_BUFFER_BIT)
-    (print "Color component: " cmp)
+    
     (sc/update-entity ces ent
-                      [:color]
+                      [:background-color :color]
                       (constantly
                        (util/clr-lerp lf (:init-color cmp) end-clr)))))
     

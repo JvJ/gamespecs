@@ -1,5 +1,11 @@
 
 * 08/19/2013
   - [X] Find a way to reset default state.
-  - [ ] Implement the reset method in the libgdx application adapter
-	- Use a key combo, and document it!
+  - [X] Implement the reset method in the libgdx application adapter
+    - Use a key combo, and document it!
+    - Key Combo is Ctrl-R (In the application window)
+
+* 08/23/2013
+  - [ ] Get Animations working!
+  - [ ] Start with physics
+    - [ ] Some immutable physics state is necessary when resetting!

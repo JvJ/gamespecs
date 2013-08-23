@@ -28,114 +28,112 @@
 ;;;; Backend keywords
 (def LWJGL ::LWJGL)
 
-
 (defmethod app/engine-app LWJGL
-  [astate
-   &{:as hooks}]
-  {:pre [(every? sequential? (vals hooks))]}
+  [{:as astate}]
   
-  (let [astate-atom (atom astate)
-        
-        {:keys [startup
-                pre-update
-                post-update
-                pre-render
-                post-render
-                paused
-                disposed]}
-        (ft/fmap #(apply comp (reverse %)) (or hooks {}))]
+  (let [init-astate (atom astate)
+        astate-atom (atom astate)]
     
     (proxy
-     [GamespecsApplicationAdapter] []
-     
-      ;;; This method creates the app
-     (create
-      []
-       (println "Creation exists!")
-       (println "The this: " this)
-       ;; We need to set the input processor to work with
-       ;; gamespecs
-       (.setInputProcessor
-        Gdx/input
-        (proxy [InputAdapter] []
-          (keyDown [keycode]
-            (swap! astate-atom update-in [:input-state]
-                   inp/press-key keycode)
-            true)
-          (keyUp [keycode]
-            (swap! astate-atom update-in [:input-state]
-                   inp/release-key keycode)
-            true)))
-       
-       ;; Next, apply the startup function
-       (error-print-block
-        (swap! astate-atom startup)))
+        [GamespecsApplicationAdapter] []
       
-     
-     ;; The rendering/update hooks
-     (render
-       []
-       ;; Reset the app if we hit the keys
-       ;;(if (app/reset-key-combo @astate-atom)
-       ;;  (.reset this))
-       
-       (error-print-block
-        (let [dt  (.getDeltaTime Gdx/graphics)]
-          (swap! astate-atom assoc :delta-time dt)
-          (swap! astate-atom update-in [:total-time] + dt)))
-       (error-print-block
-        (swap! astate-atom pre-update))
-       (error-print-block
-        (swap! astate-atom pre-render))
-       (error-print-block
-        (swap! astate-atom scs/advance-ces))
-       (error-print-block
-        (swap! astate-atom post-render))
-       (error-print-block
-        (swap! astate-atom post-update))
-       (error-print-block
-        (swap! astate-atom inp/update-keys (:delta-time @astate-atom))))
+      ;;; This method creates the app
+      (create
+        []
 
-     ;; Pausing
-     (pause
-       []
-       (error-print-block
-        (swap! astate-atom paused)))
-     
-     ;; Disposing!
-     (dispose
-       []
-       (error-print-block
-        (swap! astate-atom disposed)))
+        ;; We need to set the input processor to work with
+        ;; gamespecs
+        (.setInputProcessor
+         Gdx/input
+         (proxy [InputAdapter] []
+           (keyDown [keycode]
+             (swap! astate-atom inp/press-key keycode)
+             true)
+           (keyUp [keycode]
+             (swap! astate-atom inp/release-key keycode)
+             true)))
+        
+        ;; Next, apply the startup function
+        (app/error-print-block [:startup]
+                               (swap! astate-atom (:startup @astate-atom))))
+      
+      
+      ;; The rendering/update hooks
+      (render
+        []
+        (let [{{:keys [pre-update
+                       pre-render
+                       post-render
+                       post-update]} :hooks} @astate-atom]
+          (println "Starting render cycle")
 
-     (getInitialState []
-       astate)
+          ;; Reset the app if we hit the keys
+          (if (app/reset-key-combo @astate-atom)
+            (.reset this))
+            
+          (app/error-print-block
+           [:delta-time]
+           (let [dt  (.getDeltaTime Gdx/graphics)]
+             (swap! astate-atom assoc :delta-time dt)
+             (swap! astate-atom update-in [:total-time] + dt)))
+          
+          ;; Hooks
+          (app/error-print-block
+           [:pre-update]
+           (swap! astate-atom pre-update))
+          (app/error-print-block
+           [:pre-render]
+           (swap! astate-atom pre-render))
+          ;; Main update
+          (app/error-print-block
+           [:advance-ces]
+           (binding [app/*app-state* @astate-atom]
+             (swap! astate-atom update-in [:ces] scs/advance-ces)))
+          ;; Hooks again
+          (app/error-print-block
+           [:post-render]
+           (swap! astate-atom post-render))
+          (app/error-print-block
+           [:post-update]
+           (swap! astate-atom post-update))
+          ;; Input update
+          (app/error-print-block
+           [:update-keys]
+           (swap! astate-atom inp/update-keys (:delta-time @astate-atom)))))
 
-     (getCurrentState []
-       @astate-atom)
-     
-     (reset []
-       (reset! astate-atom astate)))))
-
+      ;; Pausing
+      (pause
+        []
+        (app/error-print-block
+         [:paused]
+         (swap! astate-atom (:paused @astate-atom))))
+      
+      ;; Disposing!
+      (dispose
+        []
+        (app/error-print-block
+         [:disposed]
+         (swap! astate-atom (:disposed @astate-atom))))
+      
+      (getInitialState []
+        astate)
+      
+      (getCurrentState []
+        @astate-atom)
+      
+      (reset
+        ([]
+           (reset! astate-atom @init-astate))
+        ([st]
+           (reset! astate-atom
+                   (reset! init-astate st)))))))
+  
 (defmethod app/start-app-multi ::LWJGL
-  [{:keys [width
-           height
-           title
-           app-state
-           display-settings
-           hooks
-           backend]
+  [{{[width height] :display-res} :display-settings
+    title :title
     :as m}]
 
-  (let [display-settings (app/display-settings-gen display-settings [width height])
-        
-        app-state (merge app-state {:backend backend})
-        
-        ;; Merge with the app-state last, so that
-        ;; any pre-existing options overwrite the defaults        
-        app-state (app/app-state-merge app-state display-settings)
-        
-        _ (clojure.pprint/pprint app-state)
+  (let [_ (clojure.pprint/pprint m)
         
         ;; App Configuration
         cfg (LwjglApplicationConfiguration.)
@@ -146,6 +144,7 @@
         ;; Constant options
         _ (set! (. cfg useGL20) false)
         _ (set! (. cfg vSyncEnabled) true)]
-    (LwjglApplication. (apply app/engine-app app-state
-                              (apply concat hooks))
-                       cfg)))
+    (LwjglApplication.
+     (reset! app/current-app-adapter
+             (app/engine-app m))
+     cfg)))
