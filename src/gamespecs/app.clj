@@ -181,3 +181,7 @@ state."
         ;; Looks like resizing can't happen
         ;;(.resize @current-app width height)
         current-app)))
+
+(def app-with-state
+  "Convenience function.  Composition of start-app and make-app-state."
+  (comp start-app make-app-state))

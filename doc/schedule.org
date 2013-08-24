@@ -7,5 +7,9 @@
 
 * 08/23/2013
   - [ ] Get Animations working!
-  - [ ] Start with physics
+    - [ ] This will require access to the old hard drive
+  - [-] Start with physics
+    - [ ] Get a basic demo working
+    - [X] Get a debug draw!
+      - Already provided by libgdx!
     - [ ] Some immutable physics state is necessary when resetting!

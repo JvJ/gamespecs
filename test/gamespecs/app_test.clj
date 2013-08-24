@@ -6,11 +6,10 @@
   []
   (let [test-ces (gs/make-ces {:entities [[(gs/background-color [#f,0])]]
                                :systems [(gs/bg-color-draw-update 0 20 [#f,1 #f,0 #f,1 #f,1])]})]
-    (gs/start-app
-     (gs/make-app-state :backend lw/LWJGL
-                        :ces test-ces
-                        :title "Timer Test"
-                        :display-settings {:display-res [400 800]}))))
+    (gs/app-with-state :backend lw/LWJGL
+                       :ces test-ces
+                       :title "Timer Test"
+                       :display-settings {:display-res [640 480]})))
 
 
 (defn test-dbg-opts

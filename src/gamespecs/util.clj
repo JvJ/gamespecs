@@ -10,7 +10,9 @@ State monad functions expect the following state format:
 
   (:use [simplecs.core]
         [clojure.algo.monads])
-  )
+  (:import (com.badlogic.gdx.physics.box2d World)
+           (com.badlogic.gdx.math Vector2
+                                  Vector3)))
 
 
 ;;;; State Monad Functions
@@ -205,15 +207,7 @@ than a rest argument."
   "Partial vector subtract."
   [& r]
   (fn [a]
-    (apply - a r)))
-
-;;;; Reader macro functions
-(defn make-float
-  [x]
-  (if (seq? x)
-    `(float ~@x)
-    `(float ~x)))
-  
+    (apply - a r)))  
 
 (defn lerp
   "Interpolate a factor of f between vectors a and b."
@@ -249,3 +243,17 @@ than a rest argument."
   (map float (lerp factor a b))) 
   
   
+;;;; Reader macro functions
+(defn make-float
+  [x]
+  (if (seq? x)
+    `(float ~@x)
+    `(float ~x)))
+
+(defn b2vec2
+  [[x y]]
+  `(Vector2. (float ~x) (float ~y)))
+
+(defn b2vec3
+  [[x y z]]
+  `(Vector3. (float ~x) (float ~y) (float ~z)))

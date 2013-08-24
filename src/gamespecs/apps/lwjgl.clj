@@ -65,7 +65,6 @@
                        pre-render
                        post-render
                        post-update]} :hooks} @astate-atom]
-          (println "Starting render cycle")
 
           ;; Reset the app if we hit the keys
           (if (app/reset-key-combo @astate-atom)
