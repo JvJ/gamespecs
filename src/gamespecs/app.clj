@@ -79,6 +79,30 @@ exception if it occurs."
  represent the ces as it was *before* the update cycle started."
   nil)
 
+;;;; Pre-made hooks
+(defn set-flag-hook
+  "Create a hook that sets a flag to true in the app state."
+  [flag]
+  #(assoc % flag true))
+
+(defn clear-flag-hook
+  "Create a hook that clears a flag from the app state."
+  [flag]
+  #(dissoc % flag))
+
+(defn pause-hook
+  "Turns on the :paused flag of the application state.
+ Note that this does not automatically turn off ces updates.
+ You should check for the pause flag if you want to pause a
+ particular system."
+  [m]
+  (assoc m :paused true))
+
+(defn resume-hook
+  "Turns off the :paused flag of the application state."
+  [m]
+  (dissoc m :paused))
+
 ;;;; 
 (defn make-app-state
   "Returns a default application state as a map, which includes the
@@ -99,7 +123,9 @@ exception if it occurs."
   Start of app : startup
   Update cycle : pre-update, pre-render, post-update, post-render
   Pause : paused
+  Resume : resumed
   Dispose (end of app) : disposed
+  Reset : reset
 
  The user may provide additional map entries as key-value pairs in the
  arguments.  (i.e. (default-app-state :a 1 :b 2 :c 3))
@@ -142,7 +168,9 @@ exception if it occurs."
                            :post-update nil
                            :post-render nil
                            :paused nil
-                           :disposed nil}
+                           :resumed nil
+                           :disposed nil
+                           :reset nil}
                           hooks))})
 
 (def current-app

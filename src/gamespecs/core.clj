@@ -26,4 +26,8 @@
             gamespecs.input
             gamespecs.util
             gamespecs.files
-            gamespecs.systems)
+            gamespecs.systems
+            gamespecs.physics)
+
+
+

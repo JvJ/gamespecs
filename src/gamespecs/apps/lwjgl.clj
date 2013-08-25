@@ -28,6 +28,16 @@
 ;;;; Backend keywords
 (def LWJGL ::LWJGL)
 
+(defn make-camera
+  "Reset hook."
+  [{camera :camera
+    {[w h] :forced-res} :display-settings
+    :as m}]
+  (if-not camera
+    (assoc m :camera
+           (OrthographicCamera. (float w) (float h)))
+    m))
+
 (defmethod app/engine-app LWJGL
   [{:as astate}]
   
@@ -55,7 +65,11 @@
         
         ;; Next, apply the startup function
         (app/error-print-block [:startup]
-                               (swap! astate-atom (:startup @astate-atom))))
+                               (swap! astate-atom (:startup (:hooks @astate-atom))))
+        
+        ;; The reset is always called at the beginning
+        ;; of the application cycle
+        (.reset this))
       
       
       ;; The rendering/update hooks
@@ -105,14 +119,21 @@
         []
         (app/error-print-block
          [:paused]
-         (swap! astate-atom (:paused @astate-atom))))
+         (swap! astate-atom (:paused (:hooks @astate-atom)))))
       
+      ;; Resuming
+      (resume
+        []
+        (app/error-print-block
+         [:resumed]
+         (swap! astate-atom (:resumed (:hooks @astate-atom)))))
+
       ;; Disposing!
       (dispose
         []
         (app/error-print-block
          [:disposed]
-         (swap! astate-atom (:disposed @astate-atom))))
+         (swap! astate-atom (:disposed (:hooks @astate-atom)))))
       
       (getInitialState []
         astate)
@@ -122,10 +143,14 @@
       
       (reset
         ([]
-           (reset! astate-atom @init-astate))
+           (reset! astate-atom @init-astate)
+           (swap! astate-atom
+                  (:reset (:hooks @astate-atom))))
         ([st]
            (reset! astate-atom
-                   (reset! init-astate st)))))))
+                   (reset! init-astate st))
+           (swap! astate-atom
+                  (:reset (:hooks @astate-atom))))))))
   
 (defmethod app/start-app-multi ::LWJGL
   [{{[width height] :display-res} :display-settings

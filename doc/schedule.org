@@ -12,4 +12,10 @@
     - [ ] Get a basic demo working
     - [X] Get a debug draw!
       - Already provided by libgdx!
-    - [ ] Some immutable physics state is necessary when resetting!
+    - [X] Some immutable physics state is necessary when resetting!
+      - Used function
+* 08/24/2013
+  - [X] Get shape fixtures working and test debug draw
+* 08/24/2013
+  - [X] Look into cameras, see why the debug draw isn't showing anything
+  - [ ] Get to work on Fixture Definition Language!!
