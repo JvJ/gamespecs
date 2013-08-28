@@ -7,7 +7,9 @@
             gamespecs.input
             gamespecs.util
             gamespecs.files
-            gamespecs.systems))
+            gamespecs.systems
+            gamespecs.physics
+            gamespecs.shapes))
 
 (defmacro import-nss
   "Import entire namespaces."
@@ -27,7 +29,5 @@
             gamespecs.util
             gamespecs.files
             gamespecs.systems
-            gamespecs.physics)
-
-
-
+            gamespecs.physics
+            gamespecs.shapes)

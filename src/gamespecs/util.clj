@@ -257,3 +257,22 @@ than a rest argument."
 (defn b2vec3
   [[x y z]]
   `(Vector3. (float ~x) (float ~y) (float ~z)))
+
+(defn v2-to-floats
+  "Convert 2d vectors to a float array."
+  [vecs]
+  (float-array
+   (reduce #(conj %1 (. %2 x) (. %2 y))
+           [] vecs)))
+
+;;; Just a nested map func!
+(defn nested-map
+  [f [x & xs :as xss]]
+  (lazy-seq
+   (cond (empty? xss) ()
+         (sequential? x) (cons (nested-map f x) (nested-map f xs))
+         :else (cons (f x) (nested-map f xs)))))
+
+;;; LEFTOFF: seq map!!
+           
+    
