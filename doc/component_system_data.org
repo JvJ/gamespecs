@@ -1,0 +1,20 @@
+#+TITLE: gamespecs - Components, Systems and Data Structures
+
+* State Machine
+
+* Physics
+
+Physics is provided by the Box2D physics engine.
+
+** Body Definition
+
+Body definition is provided by Blang, the body definition language.  This can be found under the namespace _gamespecs.blang_.
+
+Blang provides a set of operators for defining multiple-body entities and multiple-fixture bodies.  The primary operators used are the macros _bod_ and _fix_, which allows for the specification of a hierarchical tree of transformation matrices, along with body and fixture definitions.
+
+
+*** Blang Operators
+    - fix :: Fixture definition
+      - params :: [&{:keys [transforms shape density friction restitution]}]
+      - This function does some stuff. 
+    - ffsdf :: 

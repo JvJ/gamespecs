@@ -10,6 +10,7 @@ State monad functions expect the following state format:
 
   (:use [simplecs.core]
         [clojure.algo.monads])
+
   (:import (com.badlogic.gdx.physics.box2d World)
            (com.badlogic.gdx.math Vector2
                                   Vector3)))
@@ -273,6 +274,14 @@ than a rest argument."
          (sequential? x) (cons (nested-map f x) (nested-map f xs))
          :else (cons (f x) (nested-map f xs)))))
 
-;;; LEFTOFF: seq map!!
-           
-    
+(defn seq-map
+  "Returns a sequence where f is applied to all the subsequences.
+ xs must be a sequence."
+  [f xs]
+  (cons (f xs)
+        (->> (map #(if (sequential? %)
+                     (seq-map f %)
+                     nil)
+                  xs)
+             (filter identity))))
+                   

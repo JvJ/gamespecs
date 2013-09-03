@@ -1,5 +1,5 @@
-(ns gamespecs.shapes
-  "A sublanguage for defining shapes."
+(ns gamespecs.blang
+  "A sublanguage for defining bodies and fixtures."
   (:require [gamespecs.util :as util]
             [clojure.walk :as wk])
   (:import (com.badlogic.gdx.math Matrix3
@@ -21,11 +21,12 @@
                                            PolygonShape)))
 
 
-(def align-flags #{:center :left :right :top :bottom})
+(def valid-align-flag? #{:center :left :right :top :bottom})
 
 (def ^:dynamic *the-matrix*
   "The current transformation matrix."
   (. (Matrix3.) idt))
+
 
 ;;; Macros for using the matrix
 (defmacro with-transforms
@@ -86,7 +87,6 @@
         _ (set! (. f density) density)
         _ (set! (. f friction) friction)
         _ (set! (. f restitution) restitution)]
-    ;; LEFTOFF: Turn this into a macro!!)
     (with-meta
       (cons f children)
       {:matrix *the-matrix* 
@@ -115,6 +115,9 @@
                                fxs))
         _ (doseq [s (flatten (:shapes (meta ret)))] (. s (dispose)))]
     ret))
+
+(defn create-body
+  "Create a body, along with its sub-bodies and sub-fixtures."
                                
 
 ;;; Shape utilities
@@ -140,7 +143,7 @@
  alignment is center."
     [&{:keys[align]
        :or {align :center}}]
-    {:pre [(align-flags align)]}
+    {:pre [(valid-align-flag? align)]}
     #(let [vecs
           (->>
            [#v2(1,0) #v2(tx,ty) #v2(tx,(- ty))]
@@ -160,7 +163,7 @@
   "Create an isoceles triangle, defined by the ratio of its base to
  its length, oriented along the x axis.  Default alignment is left."
   [r &{:keys [align] :or {align :left}}]
-  {:pre [(align-flags align)]}
+  {:pre [(valid-align-flag? align)]}
   #(let [verts [#v2(r,0) #v2(0,1) #v2(0,-1)]
         centroid (. (reduce (fn [v1 v2] (. v1 (add v2))) #v2(0,0) verts)
                     (div #f,3))
@@ -182,7 +185,7 @@
   "Defines a rectangle along the x axis, defined by the
  ratio of its width to its height.  Default alignment is center"
   [r &{:keys [align] :or {align :center}}]
-  {:pre [(align-flags align)]}
+  {:pre [(valid-align-flag? align)]}
   #(let [verts (->> [#v2(0,0) #v2(r,0) #v2(r,1) #v2(0,1)]
                    (v-shift (case align
                               :center #v2((- (/ r 2.0)),-0.5)
@@ -199,7 +202,7 @@
   "Make a unit circle.  Default alignment is
  centered."
   [&{:keys[align] :or {align :center}}]
-  {:pre [(align-flags align)]}
+  {:pre [(valid-align-flag? align)]}
   #(let [vert (case align :center #v2(0,0) :left #v2(1,0)
                     :right #v2((- 1),0) :top #v2(0,(- 1))
                     :bottom #v2(0,1))

@@ -3,6 +3,7 @@
             [gamespecs.physics :as ph]
             [gamespecs.shapes :as sh]
             [gamespecs.apps.lwjgl :as lw]
+            [gamespecs.util :as util]
             [clojure.walk :as wk])
   (:import (com.badlogic.gdx.physics.box2d Box2DDebugRenderer
                                            BodyDef
@@ -55,27 +56,30 @@
     w))
 
 (defn test-shape []
-  (sh/fix {:transforms [(sh/scale 20)]
+  (sh/fix {:transforms [(sh/rotate 29)
+                        (sh/scale 20)]
            :shape (sh/circ :align :bottom)}
           (sh/fix {:transforms [(sh/rotate -90)
                                 (sh/translate #v2(0,0))]
                    :shape (sh/rect 3 :align :left)}
                   #_(sh/fix {:transforms [(sh/translate #v2(0,2))]
-                           :shape (sh/eq-tri)})
-                  (sh/fix {:transforms [(sh/rotate 45)
-                                        (sh/scale 0.5)]
-                           :shape (sh/rect 5 :align :left)})
-                  (sh/fix {:transforms [(sh/rotate -45)
-                                        (sh/scale 0.5)]
-                           :shape (sh/rect 5 :align :left)})
-                  (sh/fix {:transforms [(sh/translate #v2(3,0))
+                             :shape (sh/eq-tri)})
+                  (sh/fix {:transforms [(sh/translate #v2(0,0.2))
                                         (sh/rotate 45)
                                         (sh/scale 0.5)]
                            :shape (sh/rect 5 :align :left)})
-                  (sh/fix {:transforms [(sh/translate #v2(3,0))
+                  (sh/fix {:transforms [(sh/translate #v2(0,-0.2))
                                         (sh/rotate -45)
                                         (sh/scale 0.5)]
-                           :shape (sh/rect 5 :align :left)}))))
+                           :shape (sh/rect 5 :align :left)})
+                  (sh/fix {:transforms [(sh/translate #v2(3,0.2))
+                                        (sh/rotate 30)
+                                        (sh/scale 0.5)]
+                           :shape (sh/rect 6 :align :left)})
+                  (sh/fix {:transforms [(sh/translate #v2(3,-0.2))
+                                        (sh/rotate -30)
+                                        (sh/scale 0.5)]
+                           :shape (sh/rect 6 :align :left)}))))
 
 (defn make-bodies-2
   "Create shapes with the shapes library."
@@ -88,11 +92,10 @@
         fxs (sh/create-fixtures bd ts)
         
         _ (println "Meta shapes: " (:shapes (meta ts)))
-        _ (println "Meta matrices: "
-                   (wk/prewalk #(if (sequential? %)
-                                  (:matrix (meta %))
-                                  nil)
-                               fxs))
+        _ #_(println "Meta matrix: " (:matrix (meta ts)))
+        (println "Meta matrices: " (util/seq-map
+                                    (comp :matrix meta)
+                                    ts))
         ;; The box on the ground
         groundBodyDef (BodyDef.)
         _ (.. groundBodyDef position (set #v2(0,10)))

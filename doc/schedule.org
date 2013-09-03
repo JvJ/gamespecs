@@ -23,3 +23,12 @@
 * 08/28/2013
   - [ ] Create the seq-map function (for accessing the metadata)
     Maybe using reduce?
+  - [ ] Map sprites to shapes and their transformation matrices
+  
+* 08/29/2013
+  - [ ] Mess around with joints
+  - [ ] Change fix-fn to create a nested structure of both fixtures
+    and bodies
+    - [ ] Define a new structure
+  - [ ] State machines:
+    - Find the old temporal tate machine code!!
