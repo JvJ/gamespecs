@@ -1,20 +1,72 @@
 #+TITLE: gamespecs - Components, Systems and Data Structures
 
 * State Machine
-
+  
 * Physics
 
 Physics is provided by the Box2D physics engine.
 
 ** Body Definition
 
-Body definition is provided by Blang, the body definition language.  This can be found under the namespace _gamespecs.blang_.
+Body definition is provided by Blang, the body definition language.
+This can be found under the namespace _gamespecs.blang_. 
 
-Blang provides a set of operators for defining multiple-body entities and multiple-fixture bodies.  The primary operators used are the macros _bod_ and _fix_, which allows for the specification of a hierarchical tree of transformation matrices, along with body and fixture definitions.
+Blang provides a set of operators for defining multiple-body entities
+and multiple-fixture bodies.  The primary operators used are the
+macros _bod_ and _fix_, which allows for the specification of a
+hierarchical tree of transformation matrices, along with body and
+fixture definitions. 
 
+*** Blang Structures
+
+The primary data structures that are created by blang operators are the
+bodyspec and fixturespec.  (Please note that this is distinct from the
+BodyDef and FixtureDef in box2d.)  A bodyspec is a hierarchical
+structure of deferred evaluations (function closures) which can be
+instantiated at run-time in order to create bodies and fixtures.
+
+Each node in the spec is a map containing the following data:
+
+- Bodyspec / Fixturespec
+  - :children :: A sequence of child nodes attached to this node.
+  - :id :: A unique identifier used to refer to other nodes in the
+           current structure.
+  - :post-process :: A function to be executed on this node after the
+                     body has been constructed.  Typical examples
+                     involve attaching bodies to other bodies with
+                     joints.
+  - :joint :: A shortcut to adding 
+  - :shape :: A circle or polygon attached to the current node.  Note
+              that this should *not* be a Box2D shape primitive.  Use
+              the Blang shape operators to create it.  Creating
+              additional shapes involves attaching fixtures in the
+              child nodes.
+  - :transform :: A function which operates on transformation matrices.
+		  During body construction, this function is applied to
+                  the matrix of the parent node to create an absolute
+                  transformation matrix for the current node.
+  - :type :: A keyword representing the fixture type.
+    - Valid types:
+      - :gamespecs.blang/fixture
+      - :gamespecs.blang/body
+ 
+
+**** Box2D Metadata
+Although box2D objects do not implement Clojure's IMeta interface,
+and don't have metadata per-se, there is a blank object pointer that
+can be used to store user data (TODO: What's it called??)
 
 *** Blang Operators
+
+**** Matrix Operators
+     
+**** Shape Operators
+     
+**** Spec operators
     - fix :: Fixture definition
-      - params :: [&{:keys [transforms shape density friction restitution]}]
-      - This function does some stuff. 
-    - ffsdf :: 
+      - params :: [&{:keys [transforms shape density friction
+                  restitution]}]
+      - return :: 
+      - desc :: This function does some stuff. 
+    - 
+      - ffsdf :: 

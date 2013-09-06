@@ -21,4 +21,5 @@
                  [com.badlogic.gdx/gdx "0.9.9-SNAPSHOT"]
                  [com.badlogic.gdx/gdx-backend-lwjgl "0.9.9-SNAPSHOT"]
                  [potemkin "0.3.1"]
-                 [net.mikera/mikera "1.5.2"]])
+                 [net.mikera/mikera "1.5.2"]
+                 [swiss-arrows "0.6.0"]])
